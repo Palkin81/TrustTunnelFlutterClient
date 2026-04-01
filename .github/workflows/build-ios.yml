@@ -1,0 +1,77 @@
+name: Build iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type (appstore, adhoc, development)'
+        required: true
+        default: 'adhoc'
+        type: choice
+        options:
+          - appstore
+          - adhoc
+          - development
+
+jobs:
+  build-ios:
+    name: Build iOS IPA
+    runs-on: macos-14
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          make .dart_tool/build/entrypoint/build.dart
+
+      - name: Install CocoaPods
+        run: |
+          cd ios
+          bundle exec pod install --repo-update
+
+      - name: Configure signing
+        run: |
+          # Автоматическое управление подписью через Xcode
+          cd ios
+          sed -i '' 's/CODE_SIGN_STYLE = Manual/CODE_SIGN_STYLE = Automatic/' Runner.xcodeproj/project.pbxproj
+          sed -i '' 's/CODE_SIGN_STYLE = MANUAL/CODE_SIGN_STYLE = Automatic/' Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings 2>/dev/null || true
+
+      - name: Build IPA
+        run: |
+          flutter build ipa \
+            --release \
+            --export-options-plist=ios/export_options.plist \
+            --no-codesign || \
+          flutter build ipa --release --no-codesign
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: build/ios/ipa/*.ipa
+          retention-days: 7
+
+      - name: Upload App artifact (no sign)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app-unsigned
+          path: build/ios/ipa/*.app
+          retention-days: 7
