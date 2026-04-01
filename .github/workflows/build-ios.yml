@@ -85,5 +85,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-app-unsigned
-          path: build/ios/ipa/*.app
+          path: build/ios/Release-iphoneos/Runner.app
           retention-days: 7
