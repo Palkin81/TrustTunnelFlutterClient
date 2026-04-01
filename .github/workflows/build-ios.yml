@@ -30,6 +30,9 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Clean pub cache
+        run: rm -rf $PUB_CACHE
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
