@@ -63,7 +63,8 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
     }
 
     func updateConfiguration(serverName: String?, config: String?) throws {
-        vpnManager?.updateConfiguration(serverName: serverName, config: config)
+        // TODO: Implement when TrustTunnelClient supports updateConfiguration
+        // Метод ещё не добавлен в библиотеку TrustTunnelClient
     }
 
     func stop() throws {
