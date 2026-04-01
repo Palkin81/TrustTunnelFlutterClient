@@ -24,8 +24,8 @@ version_titles:
 build_channel: Release
 
 environment:
-  flutter: 3.38.3
-  sdk: '>=3.10.1 <4.0.0'
+  flutter: 3.41.6
+  sdk: ^3.11.4
 
 dependencies:
   drift: 2.30.0
