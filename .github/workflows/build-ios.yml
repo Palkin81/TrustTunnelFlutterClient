@@ -74,21 +74,22 @@ jobs:
             --no-codesign || \
           flutter build ipa --release --no-codesign
         
-          # Копируем .app в удобную директорию для артефакта
+          # Копируем артефакты в удобную директорию
           mkdir -p build/artifacts
-          if [ -d "build/ios/Release-iphoneos/Runner.app" ]; then
-            cp -r build/ios/Release-iphoneos/Runner.app build/artifacts/
+          # Копируем .app из архива
+          if [ -d "build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app" ]; then
+            cp -r build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/artifacts/
           fi
-          # Копируем .ipa если создан
-          if [ -f "build/ios/ipa/Runner.ipa" ]; then
-            cp build/ios/ipa/Runner.ipa build/artifacts/
+          # Копируем .xcarchive для отладки
+          if [ -d "build/ios/archive/Runner.xcarchive" ]; then
+            cp -r build/ios/archive/Runner.xcarchive build/artifacts/
           fi
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-build
-          path: build/artifacts/*.ipa
+          path: build/artifacts/Runner.xcarchive
           retention-days: 7
           if-no-files-found: ignore
 
