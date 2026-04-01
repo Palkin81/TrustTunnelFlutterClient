@@ -73,17 +73,29 @@ jobs:
             --export-options-plist=ios/export_options.plist \
             --no-codesign || \
           flutter build ipa --release --no-codesign
+        
+        # Копируем .app в удобную директорию для артефакта
+        mkdir -p build/artifacts
+        if [ -d "build/ios/Release-iphoneos/Runner.app" ]; then
+          cp -r build/ios/Release-iphoneos/Runner.app build/artifacts/
+        fi
+        # Копируем .ipa если создан
+        if [ -f "build/ios/ipa/Runner.ipa" ]; then
+          cp build/ios/ipa/Runner.ipa build/artifacts/
+        fi
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-build
-          path: build/ios/ipa/*.ipa
+          path: build/artifacts/*.ipa
           retention-days: 7
+          if-no-files-found: ignore
 
       - name: Upload App artifact (no sign)
         uses: actions/upload-artifact@v4
         with:
           name: ios-app-unsigned
-          path: build/ios/Release-iphoneos/Runner.app
+          path: build/artifacts/Runner.app
           retention-days: 7
+          if-no-files-found: ignore
