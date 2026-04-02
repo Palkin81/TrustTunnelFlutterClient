@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:trusttunnel/common/assets/asset_icons.dart';
 import 'package:trusttunnel/common/extensions/context_extensions.dart';
 import 'package:trusttunnel/common/extensions/theme_extensions.dart';
 import 'package:trusttunnel/data/model/vpn_state.dart';
+import 'package:trusttunnel/feature/settings/connection_logs/model/connection_logger_singleton.dart';
 import 'package:trusttunnel/widgets/buttons/custom_icon_button.dart';
 import 'package:trusttunnel/widgets/rotating_wrapper.dart';
 
@@ -12,7 +11,7 @@ import 'package:trusttunnel/widgets/rotating_wrapper.dart';
 /// Кнопка подключения/отключения VPN на карточке сервера.
 ///
 /// Имеет три состояния с цветовой индикацией:
-/// - **Зеленый** (connected) — VPN подключен
+/// - **Синий** (connected) — VPN подключен
 /// - **Красный** (disconnected) — VPN отключен, готов к подключению
 /// - **Серый** (pending) — процесс подключения/отключения
 /// {@endtemplate}
@@ -32,7 +31,6 @@ class ServersCardConnectionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPending = isPendingResult(vpnManagerState);
     final isConnected = vpnManagerState == VpnState.connected;
-    final isDisconnected = vpnManagerState == VpnState.disconnected;
 
     // Определяем цвет кнопки по состоянию:
     // - Синий (accent) — VPN подключен
@@ -44,8 +42,9 @@ class ServersCardConnectionButton extends StatelessWidget {
       _ => context.colors.neutralDarkDisabled, // Серый для pending
     };
 
-    log('[ServersCardConnectionButton] Build: serverId=$serverId, state=$vpnManagerState, '
-        'isPending=$isPending, isConnected=$isConnected, color=$buttonColor');
+    connectionLogger.debug(
+      'Button build: serverId=$serverId, state=$vpnManagerState, isPending=$isPending, color=$buttonColor',
+    );
 
     return Theme(
       data: context.theme.copyWith(
@@ -57,7 +56,7 @@ class ServersCardConnectionButton extends StatelessWidget {
               child: CustomIconButton.square(
                 icon: AssetIcons.update,
                 onPressed: () {
-                  log('[ServersCardConnectionButton] Tap during pending state - ignored');
+                  connectionLogger.info('Tap ignored: pending state');
                 },
                 size: 24,
                 selected: true,
@@ -66,7 +65,7 @@ class ServersCardConnectionButton extends StatelessWidget {
           : CustomIconButton.square(
               icon: AssetIcons.powerSettingsNew,
               onPressed: () {
-                log('[ServersCardConnectionButton] Tap: serverId=$serverId, fromState=$vpnManagerState');
+                connectionLogger.info('Button tapped: serverId=$serverId, fromState=$vpnManagerState');
                 onPressed();
               },
               size: 24,

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:trusttunnel/common/extensions/context_extensions.dart';
 import 'package:trusttunnel/data/model/server.dart';
@@ -46,8 +44,9 @@ class _ServersCardState extends State<ServersCard> {
     final vpnManagerState = _pickedServer?.id == widget.server.id ? _vpnStatus : VpnState.disconnected;
     final isCurrentServer = _pickedServer?.id == widget.server.id;
 
-    log('[ServersCard] Build: serverId=${widget.server.id}, serverName=${widget.server.serverData.name}, '
-        'isCurrentServer=$isCurrentServer, vpnState=$vpnManagerState, pickedServerId=${_pickedServer?.id}');
+    connectionLogger.debug(
+      'ServersCard build: ${widget.server.serverData.name}, isCurrent=$isCurrentServer, state=$vpnManagerState',
+    );
 
     return CustomListTileSeparated(
       title: widget.server.serverData.name,
@@ -60,13 +59,15 @@ class _ServersCardState extends State<ServersCard> {
       trailing: ServersCardConnectionButton(
         vpnManagerState: vpnManagerState,
         onPressed: () {
-          log('[ServersCard] Button tapped: serverId=${widget.server.id}, vpnState=$vpnManagerState, isCurrent=$isCurrentServer');
+          connectionLogger.info(
+            'Button tapped: ${widget.server.serverData.name}, state=$vpnManagerState, isCurrent=$isCurrentServer',
+          );
           if (vpnManagerState != VpnState.disconnected && widget.server.id == _pickedServer?.id) {
-            log('[ServersCard] Disconnecting from VPN');
+            connectionLogger.info('Disconnecting from VPN');
             _disconnectFromVpn(context);
             _changeServer(context, null);
           } else {
-            log('[ServersCard] Connecting to VPN: ${widget.server.serverData.name}');
+            connectionLogger.info('Connecting to VPN: ${widget.server.serverData.name}');
             _connectToVpn(context, widget.server);
             _changeServer(context, widget.server.id);
           }
@@ -81,7 +82,7 @@ class _ServersCardState extends State<ServersCard> {
 
   Future<void> _disconnectFromVpn(BuildContext context) {
     final controller = VpnScope.vpnControllerOf(context);
-
+    connectionLogger.info('Stop VPN called');
     return controller.stop();
   }
 
@@ -90,22 +91,21 @@ class _ServersCardState extends State<ServersCard> {
     Server server,
   ) async {
     try {
+      connectionLogger.info('=== Starting VPN connection ===');
+      connectionLogger.info('Server: ${server.serverData.name}');
+      connectionLogger.info('IP: ${server.serverData.ipAddress}');
+      connectionLogger.info('Domain: ${server.serverData.domain}');
+
       final controller = VpnScope.vpnControllerOf(context, listen: false);
       final excludedRoutes = ExcludedRoutesScope.controllerOf(context, listen: false).excludedRoutes;
+      
+      connectionLogger.info('Excluded routes count: ${excludedRoutes.length}');
+      
       final routingProfile = RoutingScope.controllerOf(context, listen: false).routingList.firstWhere(
         (element) => element.id == server.serverData.routingProfileId,
       );
-
-      final serverName = server.serverData.name;
-      final serverIp = server.serverData.ipAddress;
-      final serverDomain = server.serverData.domain;
-
-      log('[ServersCard] Starting VPN connection to server: $serverName');
-      log('[ServersCard] Server IP: $serverIp, Domain: $serverDomain');
-      log('[ServersCard] Routing profile: ${routingProfile.data.name}, Excluded routes: ${excludedRoutes.length}');
-
-      connectionLogger.info('Starting VPN connection', serverName: serverName);
-      connectionLogger.debug('Server: $serverName, IP: $serverIp, Domain: $serverDomain');
+      
+      connectionLogger.info('Routing profile: ${routingProfile.data.name}');
 
       await controller.start(
         server: server,
@@ -113,16 +113,14 @@ class _ServersCardState extends State<ServersCard> {
         excludedRoutes: excludedRoutes,
       );
 
-      log('[ServersCard] VPN start request completed');
-      connectionLogger.info('VPN connection request sent', serverName: serverName);
+      connectionLogger.info('✓ VPN start request completed');
     } catch (e, st) {
-      final errorMessage = 'ERROR starting VPN: $e';
-      log('[ServersCard] $errorMessage', error: e, stackTrace: st);
-      connectionLogger.error('Connection failed: $e', serverName: server.serverData.name);
+      connectionLogger.error('✗ ERROR: $e');
+      connectionLogger.error('Stack trace: $st');
 
       if (context.mounted) {
         context.showInfoSnackBar(
-          message: 'Ошибка подключения: ${e.toString()}',
+          message: 'Ошибка: ${e.toString()}',
           isError: true,
         );
       }
