@@ -43,9 +43,14 @@ class _ServersCardState extends State<ServersCard> {
   Widget build(BuildContext context) {
     final vpnManagerState = _pickedServer?.id == widget.server.id ? _vpnStatus : VpnState.disconnected;
     final isCurrentServer = _pickedServer?.id == widget.server.id;
+    
+    // Всегда разрешаем нажатие, если сервер не выбран или это текущий сервер
+    final bool canInteract = _pickedServer == null || isCurrentServer;
 
     connectionLogger.debug(
-      'ServersCard build: ${widget.server.serverData.name}, isCurrent=$isCurrentServer, state=$vpnManagerState',
+      'ServersCard build: ${widget.server.serverData.name}, '
+      'pickedServerId=${_pickedServer?.id ?? "null"}, '
+      'isCurrent=$isCurrentServer, canInteract=$canInteract, state=$vpnManagerState',
     );
 
     return CustomListTileSeparated(
@@ -58,6 +63,7 @@ class _ServersCardState extends State<ServersCard> {
       ),
       trailing: ServersCardConnectionButton(
         vpnManagerState: vpnManagerState,
+        canInteract: canInteract,
         onPressed: () {
           connectionLogger.info(
             'Button tapped: ${widget.server.serverData.name}, state=$vpnManagerState, isCurrent=$isCurrentServer',

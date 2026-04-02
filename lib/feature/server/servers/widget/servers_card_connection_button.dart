@@ -19,12 +19,14 @@ class ServersCardConnectionButton extends StatelessWidget {
   final VpnState vpnManagerState;
   final VoidCallback onPressed;
   final String serverId;
+  final bool canInteract;
 
   const ServersCardConnectionButton({
     super.key,
     required this.serverId,
     required this.vpnManagerState,
     required this.onPressed,
+    this.canInteract = true,
   });
 
   @override
@@ -43,7 +45,7 @@ class ServersCardConnectionButton extends StatelessWidget {
     };
 
     connectionLogger.debug(
-      'Button build: serverId=$serverId, state=$vpnManagerState, isPending=$isPending, color=$buttonColor',
+      'Button build: serverId=$serverId, state=$vpnManagerState, canInteract=$canInteract, color=$buttonColor',
     );
 
     return Theme(
@@ -55,19 +57,23 @@ class ServersCardConnectionButton extends StatelessWidget {
               duration: const Duration(seconds: 1),
               child: CustomIconButton.square(
                 icon: AssetIcons.update,
-                onPressed: () {
-                  connectionLogger.info('Tap ignored: pending state');
-                },
+                onPressed: canInteract
+                    ? () {
+                        connectionLogger.info('Tap ignored: pending state');
+                      }
+                    : null,
                 size: 24,
                 selected: true,
               ),
             )
           : CustomIconButton.square(
               icon: AssetIcons.powerSettingsNew,
-              onPressed: () {
-                connectionLogger.info('Button tapped: serverId=$serverId, fromState=$vpnManagerState');
-                onPressed();
-              },
+              onPressed: canInteract
+                  ? () {
+                      connectionLogger.info('Button tapped: serverId=$serverId, fromState=$vpnManagerState');
+                      onPressed();
+                    }
+                  : null,
               size: 24,
               selected: isConnected,
               color: buttonColor,

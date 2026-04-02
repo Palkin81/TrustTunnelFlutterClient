@@ -96,10 +96,13 @@ class _CustomIconButtonState extends State<CustomIconButton> {
   @override
   Widget build(BuildContext context) {
     final selectedIcon = _getSelectedIcon(context);
+    final bool isEnabled = widget.onPressed != null;
 
     return IconButton(
-      onPressed: widget.onPressed != null
+      onPressed: isEnabled
           ? () {
+              // Тестовый лог для проверки нажатия
+              print('*** CustomIconButton PRESSED ***');
               widget.onPressed!();
               if (widget.selected == null) {
                 setState(() => _isSelected = !_isSelected);
