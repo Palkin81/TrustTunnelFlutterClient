@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:trusttunnel/common/assets/asset_icons.dart';
 import 'package:trusttunnel/common/extensions/context_extensions.dart';
@@ -6,6 +8,14 @@ import 'package:trusttunnel/data/model/vpn_state.dart';
 import 'package:trusttunnel/widgets/buttons/custom_icon_button.dart';
 import 'package:trusttunnel/widgets/rotating_wrapper.dart';
 
+/// {@template servers_card_connection_button}
+/// Кнопка подключения/отключения VPN на карточке сервера.
+///
+/// Имеет три состояния с цветовой индикацией:
+/// - **Зеленый** (connected) — VPN подключен
+/// - **Красный** (disconnected) — VPN отключен, готов к подключению
+/// - **Серый** (pending) — процесс подключения/отключения
+/// {@endtemplate}
 class ServersCardConnectionButton extends StatelessWidget {
   final VpnState vpnManagerState;
   final VoidCallback onPressed;
@@ -20,32 +30,60 @@ class ServersCardConnectionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool pending = isPendingResult(vpnManagerState);
+    final isPending = isPendingResult(vpnManagerState);
+    final isConnected = vpnManagerState == VpnState.connected;
+    final isDisconnected = vpnManagerState == VpnState.disconnected;
+
+    // Определяем цвет кнопки по состоянию:
+    // - Синий (accent) — VPN подключен
+    // - Красный (error) — VPN отключен, готов к подключению
+    // - Серый (neutralDarkDisabled) — процесс подключения/отключения
+    final Color buttonColor = switch (vpnManagerState) {
+      VpnState.connected => context.colors.accent, // Синий
+      VpnState.disconnected => context.colors.error, // Красный
+      _ => context.colors.neutralDarkDisabled, // Серый для pending
+    };
+
+    log('[ServersCardConnectionButton] Build: serverId=$serverId, state=$vpnManagerState, '
+        'isPending=$isPending, isConnected=$isConnected, color=$buttonColor');
 
     return Theme(
       data: context.theme.copyWith(
-        iconButtonTheme: pending
-            ? context.theme.extension<CustomFilledIconButtonTheme>()!.iconButtonInProgress
-            : context.theme.extension<CustomFilledIconButtonTheme>()!.iconButton,
+        iconButtonTheme: pendingTheme(isPending, context),
       ),
-      child: pending
+      child: isPending
           ? RotatingWidget(
               duration: const Duration(seconds: 1),
               child: CustomIconButton.square(
                 icon: AssetIcons.update,
-                onPressed: onPressed,
+                onPressed: () {
+                  log('[ServersCardConnectionButton] Tap during pending state - ignored');
+                },
                 size: 24,
                 selected: true,
               ),
             )
           : CustomIconButton.square(
               icon: AssetIcons.powerSettingsNew,
-              onPressed: onPressed,
+              onPressed: () {
+                log('[ServersCardConnectionButton] Tap: serverId=$serverId, fromState=$vpnManagerState');
+                onPressed();
+              },
               size: 24,
-              selected: vpnManagerState == VpnState.connected,
+              selected: isConnected,
+              color: buttonColor,
             ),
     );
   }
 
+  /// Возвращает тему для кнопки в зависимости от состояния
+  IconButtonThemeData pendingTheme(bool isPending, BuildContext context) {
+    if (isPending) {
+      return context.theme.extension<CustomFilledIconButtonTheme>()!.iconButtonInProgress;
+    }
+    return context.theme.extension<CustomFilledIconButtonTheme>()!.iconButton;
+  }
+
+  /// Проверяет, находится ли VPN в промежуточном состоянии
   bool isPendingResult(VpnState state) => state != VpnState.connected && state != VpnState.disconnected;
 }

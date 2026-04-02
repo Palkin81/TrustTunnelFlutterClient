@@ -44,6 +44,10 @@ class _ServersCardState extends State<ServersCard> {
   @override
   Widget build(BuildContext context) {
     final vpnManagerState = _pickedServer?.id == widget.server.id ? _vpnStatus : VpnState.disconnected;
+    final isCurrentServer = _pickedServer?.id == widget.server.id;
+
+    log('[ServersCard] Build: serverId=${widget.server.id}, serverName=${widget.server.serverData.name}, '
+        'isCurrentServer=$isCurrentServer, vpnState=$vpnManagerState, pickedServerId=${_pickedServer?.id}');
 
     return CustomListTileSeparated(
       title: widget.server.serverData.name,
@@ -56,10 +60,13 @@ class _ServersCardState extends State<ServersCard> {
       trailing: ServersCardConnectionButton(
         vpnManagerState: vpnManagerState,
         onPressed: () {
+          log('[ServersCard] Button tapped: serverId=${widget.server.id}, vpnState=$vpnManagerState, isCurrent=$isCurrentServer');
           if (vpnManagerState != VpnState.disconnected && widget.server.id == _pickedServer?.id) {
+            log('[ServersCard] Disconnecting from VPN');
             _disconnectFromVpn(context);
             _changeServer(context, null);
           } else {
+            log('[ServersCard] Connecting to VPN: ${widget.server.serverData.name}');
             _connectToVpn(context, widget.server);
             _changeServer(context, widget.server.id);
           }
