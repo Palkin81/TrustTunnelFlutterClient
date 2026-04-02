@@ -55,13 +55,13 @@ class _ConnectionLogsScreenState extends State<ConnectionLogsScreen> {
                 Icon(
                   Icons.receipt_long_outlined,
                   size: 64,
-                  color: context.colors.textSecondary,
+                  color: context.colors.neutralDarkDisabled,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   context.ln.noConnectionLogs,
                   style: context.textTheme.bodyLarge?.copyWith(
-                    color: context.colors.textSecondary,
+                    color: context.colors.neutralDarkDisabled,
                   ),
                 ),
               ],
@@ -113,7 +113,7 @@ class _LogTile extends StatelessWidget {
           log.formattedTime,
           style: context.textTheme.labelSmall?.copyWith(
             fontFamily: 'monospace',
-            color: context.colors.textSecondary,
+            color: context.colors.neutralDarkDisabled,
           ),
         ),
         const SizedBox(width: 8),
@@ -139,7 +139,7 @@ class _LogTile extends StatelessWidget {
                 Text(
                   log.serverName!,
                   style: context.textTheme.labelSmall?.copyWith(
-                    color: context.colors.textSecondary,
+                    color: context.colors.neutralDarkDisabled,
                   ),
                 ),
               ],

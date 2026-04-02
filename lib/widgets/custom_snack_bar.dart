@@ -11,7 +11,6 @@ class CustomSnackBar extends SnackBar {
     super.key,
     required super.content,
     super.action,
-    super.backgroundColor,
     super.behavior,
     super.duration,
     super.elevation,
@@ -20,7 +19,8 @@ class CustomSnackBar extends SnackBar {
     bool showCloseIcon = false,
     Color? backgroundColor,
   }) : _showCloseIcon = showCloseIcon,
-       _backgroundColor = backgroundColor;
+       _backgroundColor = backgroundColor,
+       super(backgroundColor: backgroundColor ?? Colors.transparent);
 
   @override
   Color? get backgroundColor => _backgroundColor ?? Colors.transparent;

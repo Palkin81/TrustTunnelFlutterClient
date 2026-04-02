@@ -7,7 +7,7 @@ import 'package:trusttunnel/feature/settings/connection_logs/model/connection_lo
 ///
 /// Сохраняет последние N записей лога в памяти.
 /// {@endtemplate}
-class ConnectionLogger extends ChangeNotifier {
+class ConnectionLogger extends ValueNotifier<List<ConnectionLogEntry>> {
   /// Максимальное количество записей в логе.
   static const int _maxLogs = 100;
 
@@ -15,6 +15,9 @@ class ConnectionLogger extends ChangeNotifier {
 
   /// Текущие логи подключения.
   List<ConnectionLogEntry> get logs => List.unmodifiable(_logs);
+
+  /// {@macro connection_logger}
+  ConnectionLogger() : super(const []);
 
   /// Добавляет запись в лог.
   void log({
@@ -36,7 +39,7 @@ class ConnectionLogger extends ChangeNotifier {
       _logs.removeAt(0);
     }
 
-    notifyListeners();
+    value = List.unmodifiable(_logs);
   }
 
   /// Добавляет запись с уровнем info.
@@ -57,7 +60,7 @@ class ConnectionLogger extends ChangeNotifier {
   /// Очищает все логи.
   void clear() {
     _logs.clear();
-    notifyListeners();
+    value = const [];
   }
 
   /// Экспортирует логи в виде строки.

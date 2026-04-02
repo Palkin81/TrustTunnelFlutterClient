@@ -56,7 +56,7 @@ extension SnackBarExtension on BuildContext {
           ),
           behavior: behavior,
           showCloseIcon: showCloseIcon,
-          backgroundColor: isError ? context.colors.error : null,
+          backgroundColor: isError ? colors.error : null,
         ),
       );
   }
