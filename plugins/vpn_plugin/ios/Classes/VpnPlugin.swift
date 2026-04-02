@@ -70,13 +70,8 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
         }
         NSLog("[VpnPlugin] Starting VPN for server: \(serverName)")
         NSLog("[VpnPlugin] Config length: \(config.count) chars")
-        do {
-            try vpnManager.start(serverName: serverName, config: config)
-            NSLog("[VpnPlugin] VPN start request sent successfully")
-        } catch {
-            NSLog("[VpnPlugin] ERROR starting VPN: \(error.localizedDescription)")
-            throw error
-        }
+        try vpnManager.start(serverName: serverName, config: config)
+        NSLog("[VpnPlugin] VPN start request sent successfully")
     }
 
     func updateConfiguration(serverName: String?, config: String?) throws {
@@ -94,13 +89,8 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
             )
         }
         NSLog("[VpnPlugin] Stopping VPN")
-        do {
-            try vpnManager.stop()
-            NSLog("[VpnPlugin] VPN stop request sent successfully")
-        } catch {
-            NSLog("[VpnPlugin] ERROR stopping VPN: \(error.localizedDescription)")
-            throw error
-        }
+        try vpnManager.stop()
+        NSLog("[VpnPlugin] VPN stop request sent successfully")
     }
 
     func getCurrentState() throws -> VpnManagerState {
