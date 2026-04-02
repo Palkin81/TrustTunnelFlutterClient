@@ -10,6 +10,7 @@ import 'package:trusttunnel/data/repository/vpn_repository.dart';
 import 'package:trusttunnel/feature/vpn/models/log_controller.dart';
 import 'package:trusttunnel/feature/vpn/models/vpn_aspect.dart';
 import 'package:trusttunnel/feature/vpn/models/vpn_controller.dart';
+import 'package:trusttunnel/feature/settings/connection_logs/model/connection_logger_singleton.dart';
 
 /// {@template vpn_scope_on_start_callback}
 /// Signature of the "start VPN" operation used by [VpnScope].
@@ -228,7 +229,9 @@ class _VpnScopeState extends State<VpnScope> {
     required List<String> excludedRoutes,
   }) async {
     await _stop();
-    
+
+    connectionLogger.info('Connecting to server: ${server.serverData.name}');
+
     final newServerStream = await widget.vpnRepository.startListenToStates(
       server: server,
       routingProfile: routingProfile,
@@ -249,6 +252,7 @@ class _VpnScopeState extends State<VpnScope> {
   );
 
   Future<void> _stop() async {
+    connectionLogger.info('Disconnecting from VPN');
     await widget.vpnRepository.stop();
     await _vpnStreamSub?.cancel();
     _stateNotifier.value = VpnState.disconnected;
@@ -257,6 +261,7 @@ class _VpnScopeState extends State<VpnScope> {
 
   void _onVpnStateChanged(VpnState state) {
     _stateNotifier.value = state;
+    connectionLogger.debug('VPN state changed: $state');
   }
 
   void _onLogCollected(VpnLog log) {

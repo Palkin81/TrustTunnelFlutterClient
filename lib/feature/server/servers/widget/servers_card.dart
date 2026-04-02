@@ -9,6 +9,7 @@ import 'package:trusttunnel/feature/server/server_details/widgets/server_details
 import 'package:trusttunnel/feature/server/servers/widget/scope/servers_scope.dart';
 import 'package:trusttunnel/feature/server/servers/widget/scope/servers_scope_aspect.dart';
 import 'package:trusttunnel/feature/server/servers/widget/servers_card_connection_button.dart';
+import 'package:trusttunnel/feature/settings/connection_logs/model/connection_logger_singleton.dart';
 import 'package:trusttunnel/feature/settings/excluded_routes/widgets/scope/excluded_routes_scope.dart';
 import 'package:trusttunnel/feature/vpn/widgets/vpn_scope.dart';
 import 'package:trusttunnel/widgets/common/custom_list_tile_separated.dart';
@@ -88,9 +89,16 @@ class _ServersCardState extends State<ServersCard> {
         (element) => element.id == server.serverData.routingProfileId,
       );
 
-      log('[ServersCard] Starting VPN connection to server: ${server.serverData.name}');
-      log('[ServersCard] Server IP: ${server.serverData.ipAddress}, Domain: ${server.serverData.domain}');
+      final serverName = server.serverData.name;
+      final serverIp = server.serverData.ipAddress;
+      final serverDomain = server.serverData.domain;
+
+      log('[ServersCard] Starting VPN connection to server: $serverName');
+      log('[ServersCard] Server IP: $serverIp, Domain: $serverDomain');
       log('[ServersCard] Routing profile: ${routingProfile.data.name}, Excluded routes: ${excludedRoutes.length}');
+
+      connectionLogger.info('Starting VPN connection', serverName: serverName);
+      connectionLogger.debug('Server: $serverName, IP: $serverIp, Domain: $serverDomain');
 
       await controller.start(
         server: server,
@@ -99,8 +107,12 @@ class _ServersCardState extends State<ServersCard> {
       );
 
       log('[ServersCard] VPN start request completed');
+      connectionLogger.info('VPN connection request sent', serverName: serverName);
     } catch (e, st) {
-      log('[ServersCard] ERROR starting VPN: $e', error: e, stackTrace: st);
+      final errorMessage = 'ERROR starting VPN: $e';
+      log('[ServersCard] $errorMessage', error: e, stackTrace: st);
+      connectionLogger.error('Connection failed: $e', serverName: server.serverData.name);
+
       if (context.mounted) {
         context.showInfoSnackBar(
           message: 'Ошибка подключения: ${e.toString()}',

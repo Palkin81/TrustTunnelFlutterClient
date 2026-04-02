@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trusttunnel/common/extensions/context_extensions.dart';
 import 'package:trusttunnel/common/localization/localization.dart';
 import 'package:trusttunnel/common/utils/url_utils.dart';
+import 'package:trusttunnel/feature/settings/connection_logs/widgets/connection_logs_screen.dart';
 import 'package:trusttunnel/feature/settings/excluded_routes/widgets/excluded_routes_screen.dart';
 import 'package:trusttunnel/feature/settings/query_log/widgets/query_log_screen.dart';
 import 'package:trusttunnel/feature/settings/settings_about/about_screen.dart';
@@ -20,6 +21,11 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          CustomArrowListTile(
+            title: context.ln.connectionLogs,
+            onTap: () => _pushConnectionLogsScreen(context),
+          ),
+          const Divider(),
           CustomArrowListTile(
             title: context.ln.queryLog,
             onTap: () => _pushQueryLogScreen(context),
@@ -42,6 +48,10 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     ),
+  );
+
+  void _pushConnectionLogsScreen(BuildContext context) => context.push(
+    const ConnectionLogsScreen(),
   );
 
   void _pushQueryLogScreen(BuildContext context) => context.push(

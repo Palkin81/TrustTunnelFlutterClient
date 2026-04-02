@@ -128,5 +128,11 @@
   "tlsOutOfBoundsError": "Mask and value should have the same length",
   "tlsWrongFieldError": "Hex sequence only allows 0-9, a-f characters",
   "tlsWrongValueError": "Value should have an even number of characters",
-  "tlsWrongMaskError": "Mask and value should have an even number of characters"
+  "tlsWrongMaskError": "Mask and value should have an even number of characters",
+  "connectionLogs": "Connection logs",
+  "copyLogs": "Copy logs",
+  "clearLogs": "Clear logs",
+  "noConnectionLogs": "No connection logs yet",
+  "logsCopied": "Logs copied to clipboard",
+  "logsCleared": "Logs cleared"
 }
