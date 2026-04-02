@@ -33,7 +33,8 @@ class _ServerDetailsFullScreenViewState extends State<ServerDetailsFullScreenVie
   void initState() {
     super.initState();
     final initialDataScope = ServerDetailsScope.controllerOf(context, listen: false);
-    _hasChanges = initialDataScope.hasChanges;
+    // For new server (not editing), hasChanges should be true to enable the Add button
+    _hasChanges = initialDataScope.editing ? initialDataScope.hasChanges : true;
     _editing = initialDataScope.editing;
     _data = initialDataScope.data;
     loading = initialDataScope.loading;
@@ -48,7 +49,8 @@ class _ServerDetailsFullScreenViewState extends State<ServerDetailsFullScreenVie
       aspect: ServerDetailsScopeAspect.data,
     );
 
-    _hasChanges = dataUpdate.hasChanges;
+    // For new server (not editing), hasChanges should always be true to enable the Add button
+    _hasChanges = _editing ? dataUpdate.hasChanges : true;
     _data = dataUpdate.data;
 
     final loadingUpdate = ServerDetailsScope.controllerOf(

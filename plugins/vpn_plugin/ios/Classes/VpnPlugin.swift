@@ -59,7 +59,14 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
     // MARK: - IVpnManager (Pigeon HostApi)
 
     func start(serverName: String, config: String) throws {
-        vpnManager?.start(serverName: serverName, config: config)
+        guard let vpnManager = vpnManager else {
+            throw PigeonError(
+                code: "VPN_MANAGER_NOT_INITIALIZED",
+                message: "VpnManager is not initialized",
+                details: nil
+            )
+        }
+        try vpnManager.start(serverName: serverName, config: config)
     }
 
     func updateConfiguration(serverName: String?, config: String?) throws {
@@ -68,7 +75,14 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
     }
 
     func stop() throws {
-        vpnManager?.stop()
+        guard let vpnManager = vpnManager else {
+            throw PigeonError(
+                code: "VPN_MANAGER_NOT_INITIALIZED",
+                message: "VpnManager is not initialized",
+                details: nil
+            )
+        }
+        try vpnManager.stop()
     }
 
     func getCurrentState() throws -> VpnManagerState {

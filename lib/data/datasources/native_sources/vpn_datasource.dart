@@ -12,6 +12,7 @@ import 'package:trusttunnel/data/model/vpn_log.dart';
 import 'package:trusttunnel/data/model/vpn_state.dart';
 import 'package:trusttunnel/feature/vpn/domain/services/vpn_log_converter.dart';
 import 'package:vpn_plugin/models/configuration.dart';
+import 'package:vpn_plugin/models/configuration_log_level.dart';
 import 'package:vpn_plugin/models/endpoint.dart';
 import 'package:vpn_plugin/models/query_log_row.dart';
 import 'package:vpn_plugin/models/socks.dart';
@@ -108,6 +109,9 @@ class VpnDataSourceImpl implements VpnDataSource {
     return _platformApi.start(
       serverName: server.name,
       configuration: Configuration(
+        logLevel: ConfigurationLogLevel.debug,
+        killSwitchEnabled: true,
+        postQuantumGroupEnabled: false,
         vpnMode: VpnModeEncoder().convert(
           routingProfile.defaultMode,
         ),
@@ -163,6 +167,9 @@ class VpnDataSourceImpl implements VpnDataSource {
     return _platformApi.updateConfiguration(
       serverName: server.name,
       configuration: Configuration(
+        logLevel: ConfigurationLogLevel.debug,
+        killSwitchEnabled: true,
+        postQuantumGroupEnabled: false,
         vpnMode: VpnModeEncoder().convert(
           routingProfile.defaultMode,
         ),
