@@ -42,11 +42,9 @@ class _ConnectionLogsScreenState extends State<ConnectionLogsScreen> {
         ),
       ],
     ),
-    body: ValueListenableBuilder<ConnectionLogger>(
+    body: ValueListenableBuilder<List<ConnectionLogEntry>>(
       valueListenable: _logger,
-      builder: (context, logger, _) {
-        final logs = logger.logs;
-
+      builder: (context, logs, _) {
         if (logs.isEmpty) {
           return Center(
             child: Column(
