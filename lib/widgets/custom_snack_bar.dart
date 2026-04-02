@@ -5,6 +5,7 @@ import 'package:trusttunnel/widgets/buttons/custom_icon_button.dart';
 
 class CustomSnackBar extends SnackBar {
   final bool _showCloseIcon;
+  final Color? _backgroundColor;
 
   const CustomSnackBar({
     super.key,
@@ -17,10 +18,12 @@ class CustomSnackBar extends SnackBar {
     super.margin,
     super.shape,
     bool showCloseIcon = false,
-  }) : _showCloseIcon = showCloseIcon;
+    Color? backgroundColor,
+  }) : _showCloseIcon = showCloseIcon,
+       _backgroundColor = backgroundColor;
 
   @override
-  Color? get backgroundColor => Colors.transparent;
+  Color? get backgroundColor => _backgroundColor ?? Colors.transparent;
 
   @override
   bool get showCloseIcon => false;

@@ -50,6 +50,7 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
 
     private var state: VpnManagerState = .disconnected {
         didSet {
+            NSLog("[VpnPlugin] State changed: \(oldValue) -> \(state)")
             DispatchQueue.main.async {
                 self.emitState(self.state)
             }
@@ -60,13 +61,22 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
 
     func start(serverName: String, config: String) throws {
         guard let vpnManager = vpnManager else {
+            NSLog("[VpnPlugin] ERROR: VpnManager is not initialized")
             throw PigeonError(
                 code: "VPN_MANAGER_NOT_INITIALIZED",
                 message: "VpnManager is not initialized",
                 details: nil
             )
         }
-        try vpnManager.start(serverName: serverName, config: config)
+        NSLog("[VpnPlugin] Starting VPN for server: \(serverName)")
+        NSLog("[VpnPlugin] Config length: \(config.count) chars")
+        do {
+            try vpnManager.start(serverName: serverName, config: config)
+            NSLog("[VpnPlugin] VPN start request sent successfully")
+        } catch {
+            NSLog("[VpnPlugin] ERROR starting VPN: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     func updateConfiguration(serverName: String?, config: String?) throws {
@@ -76,13 +86,21 @@ final class IVpnManagerImpl: NSObject, IVpnManager, FlutterStreamHandler {
 
     func stop() throws {
         guard let vpnManager = vpnManager else {
+            NSLog("[VpnPlugin] ERROR: VpnManager is not initialized")
             throw PigeonError(
                 code: "VPN_MANAGER_NOT_INITIALIZED",
                 message: "VpnManager is not initialized",
                 details: nil
             )
         }
-        try vpnManager.stop()
+        NSLog("[VpnPlugin] Stopping VPN")
+        do {
+            try vpnManager.stop()
+            NSLog("[VpnPlugin] VPN stop request sent successfully")
+        } catch {
+            NSLog("[VpnPlugin] ERROR stopping VPN: \(error.localizedDescription)")
+            throw error
+        }
     }
 
     func getCurrentState() throws -> VpnManagerState {

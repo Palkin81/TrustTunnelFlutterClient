@@ -39,6 +39,7 @@ extension SnackBarExtension on BuildContext {
     required String message,
     bool showCloseIcon = true,
     SnackBarBehavior behavior = SnackBarBehavior.fixed,
+    bool isError = false,
   }) {
     var scaffoldMessenger = ScaffoldMessenger.of(this);
 
@@ -55,6 +56,7 @@ extension SnackBarExtension on BuildContext {
           ),
           behavior: behavior,
           showCloseIcon: showCloseIcon,
+          backgroundColor: isError ? context.colors.error : null,
         ),
       );
   }

@@ -31,6 +31,6 @@ class AboutScreen extends StatelessWidget {
   Future<String> _getPackageVersion() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-    return 'V${packageInfo.version}';
+    return 'v${packageInfo.version} (${packageInfo.buildNumber})';
   }
 }

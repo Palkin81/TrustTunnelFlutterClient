@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:trusttunnel/common/extensions/context_extensions.dart';
 import 'package:trusttunnel/data/model/server.dart';
@@ -79,17 +81,33 @@ class _ServersCardState extends State<ServersCard> {
     BuildContext context,
     Server server,
   ) async {
-    final controller = VpnScope.vpnControllerOf(context, listen: false);
-    final excludedRoutes = ExcludedRoutesScope.controllerOf(context, listen: false).excludedRoutes;
-    final routingProfile = RoutingScope.controllerOf(context, listen: false).routingList.firstWhere(
-      (element) => element.id == server.serverData.routingProfileId,
-    );
+    try {
+      final controller = VpnScope.vpnControllerOf(context, listen: false);
+      final excludedRoutes = ExcludedRoutesScope.controllerOf(context, listen: false).excludedRoutes;
+      final routingProfile = RoutingScope.controllerOf(context, listen: false).routingList.firstWhere(
+        (element) => element.id == server.serverData.routingProfileId,
+      );
 
-    await controller.start(
-      server: server,
-      routingProfile: routingProfile,
-      excludedRoutes: excludedRoutes,
-    );
+      log('[ServersCard] Starting VPN connection to server: ${server.serverData.name}');
+      log('[ServersCard] Server IP: ${server.serverData.ipAddress}, Domain: ${server.serverData.domain}');
+      log('[ServersCard] Routing profile: ${routingProfile.data.name}, Excluded routes: ${excludedRoutes.length}');
+
+      await controller.start(
+        server: server,
+        routingProfile: routingProfile,
+        excludedRoutes: excludedRoutes,
+      );
+
+      log('[ServersCard] VPN start request completed');
+    } catch (e, st) {
+      log('[ServersCard] ERROR starting VPN: $e', error: e, stackTrace: st);
+      if (context.mounted) {
+        context.showInfoSnackBar(
+          message: 'Ошибка подключения: ${e.toString()}',
+          isError: true,
+        );
+      }
+    }
   }
 
   void _pushServerDetailsScreen(
